@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+       <div id="container" style="height: 100%"></div>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+       <script type="text/javascript">
+	data = {
+        //从小到大
+        asks:[[3580.38,200.0],[3586.17,178],[3587.96,176.20],[3589.75,165.60],[3591.54,152.62],[3593.33,150.83],[3595.12,140.61],[3596.92,131.58],[3598.71,121.66],[3600.50,11.14]],
+        //从大到小
+		bids:[[3580.19,11.91],[3579.00,56.2],[3577.21,114.9],[3575.42,115.95],[3573.63,116.40],[3571.84,117.95],[3570.05,118.89],[3568.25,119.58],[3566.46,120.18],[3564.67,124.22]]
+    }
+
+
+let obj2arr = (arr, key, up = true) => {
+    let array = [];
+    arr.map((item) => {
+        array.push(item[key])
+    });
+    return array;
+};
+//中心价格
+var center_price = parseFloat(((data["asks"][0][0]+data["bids"][0][0])/2).toFixed(2));
+data['bids'] = data['bids'].sort();
+var category = [];
+var category_bids = obj2arr(data['bids'],0);
+var category_asks = obj2arr(data['asks'],0);
+category = category_bids;
+category.push(center_price);
+category = category.concat(category_asks);
+
+console.log(category);
+var bids = obj2arr(data['bids'],1);
+bids.push(0);
+console.log(bids);
+data['asks'] = data['asks'].reverse();
+var ask = [];
+for (let index = 0; index < bids.length-1; index++) {
+    ask.push('');
+}
+ask.push(0);
+var asks = ask.concat(obj2arr(data['asks'],1));
+
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+option = {
+    backgroundColor: '#394056',
+    animation: false,
+    tooltip : {
+        showContent: false,
+        trigger: 'axis',
+        // axisPointer: {
+        //     type: 'cross',
+        //     label: {
+        //         backgroundColor: '#6a7985'
+        //     }
+        // }
+    },
+    grid: {
+        left: '0',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap: false,
+            axisLabel: {
+                showMinLabel: false
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#6a7985'
+                }
+            },
+            data : category
+        }
+    ],
+    yAxis: [{
+        type: 'value',
+        position: 'right',
+        splitNumber: 4,
+        axisTick: {
+            inside: true,
+        },
+        axisLabel: {
+            showMinLabel: false,
+            textStyle: {
+                fontSize: 14
+            }
+        },
+        splitLine: {
+            show: false,
+        },
+        axisLine: {
+            lineStyle: {
+                color: '#6a7985'
+            }
+        }
+    }],
+    series : [
+        {
+            name:'bids',
+            type:'line',
+            smooth: true,
+            lineStyle: {
+                normal: {
+                    width: 2,
+                }
+            },
+            areaStyle: {
+                normal: {
+                    color: '#123239'
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#37AD7B'
+                }
+            },
+            label: {
+                show: true,
+                position: 'right',
+                distance: 10,
+                padding: 10,
+                fontSize: 12,
+                color: '#fff',
+                backgroundColor: '#37AD7B',
+                formatter: function (params) {
+                    return [`价格 ：{a|${params.name}}`, `总量 ：{a|${Math.round(params.value)}}`].join('\n')
+                },
+                rich: {
+                    a: {
+                        color: '#fff',
+                        fontSize: '12',
+                        fontWeight: 'bold',
+                        lineHeight: '20',
+                    },
+                }
+            },
+            symbol: 'circle',
+            showSymbol: false,
+            symbolSize: 10,
+            data:bids
+        },
+        {
+            name:'asks',
+            type:'line',
+            smooth: true,
+            lineStyle: {
+                normal: {
+                    width: 2
+                }
+            },
+            areaStyle: {
+                normal: {
+                    color: '#411F31'
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#D24454'
+                }
+            },
+            label: {
+                show: true,
+                position: 'left',
+                distance: 10,
+                padding: 10,
+                fontSize: 12,
+                color: '#fff',
+                backgroundColor:"#D24454",
+                formatter: function (params) {
+                    return [`价格 ：{a|${params.name}}`, `总量 ：{a|${Math.round(params.value)}}`].join('\n')
+                },
+                rich: {
+                    a: {
+                        color: '#fff',
+                        fontSize: '12',
+                        fontWeight: 'bold',
+                        lineHeight: '20',
+                    },
+                }
+            },
+            symbol: 'circle',
+            showSymbol: false,
+            symbolSize: 10,
+            data:asks
+        }
+    ]
+};
+;
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+window.onresize = function () {
+    myChart.resize();
+};
+       </script>
+   </body>
+</html>
+<!--  -->
